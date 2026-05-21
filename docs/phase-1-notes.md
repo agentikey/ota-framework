@@ -8,15 +8,15 @@ with the phase that should pick it up.
 
 ### Phase 2A — framework runtime
 
-- **`verb` decorator placeholder.** [ota_core/policy/__init__.py](../ota_core/policy/__init__.py) currently identity-wraps the decorated function and attaches a `_ota_verb_meta` dict for the future L0b layer to read. No enforcement of `idempotency`, `required_scopes`, or `destructive`. Phase 2A.5 replaces this with the real L0b policy layer.
+- ~~**`verb` decorator placeholder.**~~ **RESOLVED in Phase 2A.5.** The decorator now wraps every call to emit `tool_call.invoked` / `succeeded` / `failed` audit events via `L0bEnforcer` when a routine-run context is active, and is transparent when called outside one. Metadata still attached. See [`ota_core/policy/__init__.py`](../ota_core/policy/__init__.py) and [`ota_core/policy/l0b.py`](../ota_core/policy/l0b.py).
 
-- **Cost estimation hook missing on `LLMProvider`.** The protocol returns `Usage` (input/output/cache tokens) but does not estimate cost. L0b's `budget.max_usd_per_run` enforcement (Contract A) needs pricing tables and an `estimate_cost(request) -> Decimal` method on the provider. Add when L0b wires budgets.
+- **Cost estimation hook missing on `LLMProvider`.** Still open. The protocol returns `Usage` (input/output/cache tokens) but does not estimate cost. L0b's `reserve_llm_budget()` accepts an explicit `usd` argument so callers can estimate at call-sites for now, and `record_llm_usage()` updates `ctx.usd_spent`. The provider-side `estimate_cost(request) -> Decimal` method (and pricing tables) is **deferred to Phase 4A** when the first real adapter call goes through the LLM client and budget enforcement needs to be automatic. Phase 2A.5 just leaves the seam open.
 
 ### Phase 2B — seams
 
-- **`TokenBucket` only enforces RPS, not RPM.** Contract D `rate_limits` declares both `requests_per_second` and `requests_per_minute`. [ota_core/http/client.py](../ota_core/http/client.py) currently honors only the per-second rate. When NetworkPosture wires real Contract D rate limits in Phase 2B, layer an RPM bucket on top (two-bucket pattern, tightest wins).
+- ~~**`TokenBucket` only enforces RPS, not RPM.**~~ **RESOLVED in Phase 2B.7.** `RateLimitPolicy` now accepts `requests_per_minute` + `burst_per_minute`; `TokenBucket` checks both buckets per acquire and waits for the tighter of the two. Tests in [tests/network_posture/test_posture.py](../tests/network_posture/test_posture.py).
 
-- **Allowlist is a flat `frozenset[str]` of hostnames.** Contract D supports glob patterns like `*.slack.com`. Glob expansion lives in NetworkPosture (Phase 2B.7); the interface in `HttpClient.set_allowlist()` is stable for either approach.
+- ~~**Allowlist is a flat `frozenset[str]` of hostnames.**~~ **RESOLVED in Phase 2B.7.** `HttpClient.set_allowlist()` now accepts either a `frozenset[str]` (exact match, backward compatible) or a `Callable[[str], bool]` predicate. `NetworkPosture.configure_allowlist()` compiles `fnmatch`-style globs (e.g. `*.slack.com`, `region-[12].googleapis.com`) into a predicate and installs it on the client.
 
 ### Phase 3 — capability dispatch
 
