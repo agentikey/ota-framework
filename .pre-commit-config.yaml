@@ -1,0 +1,38 @@
+# Codegen-sync hooks enforce the markdown-first source-of-truth discipline
+# documented in docs/build-plan-v0.md §3.3 (Pydantic <-> TypeScript) and
+# §3.4 (vocabulary <-> Python). Generated files are never hand-edited; the
+# hooks below regenerate on every commit and fail the commit if anything in
+# the generated paths drifts from what's staged.
+#
+# Install once (inside the project venv):
+#   pip install pre-commit
+#   pre-commit install
+# Run manually across the tree:
+#   pre-commit run --all-files
+
+repos:
+  - repo: local
+    hooks:
+      - id: gen-vocab
+        name: regenerate vocabulary -> Python stubs
+        language: python
+        additional_dependencies:
+          - "pyyaml==6.0.3"
+          - "ruff==0.15.13"
+        entry: python scripts/gen_vocab_stubs.py
+        pass_filenames: false
+
+      - id: gen-vocab-diff
+        name: vocabulary codegen drift check
+        language: system
+        entry: bash -c 'git diff --exit-code -- ota_connect/_types/ ota_connect/messaging/verbs.py ota_connect/email/verbs.py'
+        pass_filenames: false
+
+      # Dormant until Phase 4C.2 creates ota_dashboard_web/. The bash guard
+      # makes the hook a no-op while the frontend doesn't exist; once it lands
+      # this enforces the OpenAPI -> TypeScript codegen drift check per §3.3.
+      - id: gen-api-sync
+        name: OpenAPI -> TypeScript codegen sync (Phase 4C.2)
+        language: system
+        entry: bash -c 'if [ -d ota_dashboard_web ]; then cd ota_dashboard_web && pnpm gen-api && git diff --exit-code -- src/api/generated; fi'
+        pass_filenames: false

@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ota"
+version = "0.0.1"
+description = "One True Agent: framework, Connect adapter library, bundled routines, and operator dashboard API."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Proprietary" }
+authors = [{ name = "Omar Soto", email = "mrknight411@gmail.com" }]
+dependencies = [
+    "httpx==0.28.1",
+    "pydantic==2.13.4",
+    "structlog==25.5.0",
+    "pyyaml==6.0.3",
+    "cryptography==48.0.0",
+    "authlib==1.7.2",
+    "fastapi==0.136.1",
+    "uvicorn[standard]==0.47.0",
+    "anthropic==0.103.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff==0.15.13",
+    "mypy==2.1.0",
+    "pytest==9.0.3",
+    "pytest-asyncio==1.3.0",
+    "pytest-httpx==0.36.2",
+    "pre-commit==4.6.0",
+    "types-PyYAML==6.0.12.20260518",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = [
+    "ota_core*",
+    "ota_connect*",
+    "ota_routines*",
+    "ota_dashboard_api*",
+]
+exclude = [
+    "tests*",
+    "docs*",
+    "scripts*",
+    "infra*",
+    "examples*",
+    "vocabulary*",
+    "ota_dashboard_web*",
+]
+
+[tool.setuptools.package-data]
+ota_routines = ["**/*.md", "**/*.yaml", "**/*.json"]
+ota_connect = ["**/*.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"

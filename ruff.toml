@@ -1,0 +1,22 @@
+target-version = "py312"
+line-length = 100
+
+[lint]
+select = [
+    "E",     # pycodestyle errors
+    "W",     # pycodestyle warnings
+    "F",     # pyflakes
+    "I",     # isort
+    "B",     # flake8-bugbear
+    "UP",    # pyupgrade
+    "RUF",   # ruff-specific
+]
+ignore = [
+    # vocabulary specs use Generic[T] (legacy) for type-parameterized classes;
+    # auto-rewrite to PEP 695 is unsafe (orphans the TypeVar declaration).
+    "UP046",
+]
+
+[format]
+quote-style = "double"
+indent-style = "space"

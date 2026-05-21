@@ -1,0 +1,16 @@
+# Normalize line endings across platforms.
+* text=auto eol=lf
+
+# Generated files. Never hand-edit; pre-commit hooks in .pre-commit-config.yaml
+# regenerate from vocabulary/*.md and fail on drift. See docs/build-plan-v0.md
+# §3.4 (vocabulary -> Python). The `-diff` attribute suppresses default diff
+# output (still shown with --no-ext-diff if needed).
+ota_connect/_types/**.py linguist-generated=true
+ota_connect/_types/**.py -diff
+ota_connect/messaging/verbs.py linguist-generated=true
+ota_connect/messaging/verbs.py -diff
+ota_connect/email/verbs.py linguist-generated=true
+ota_connect/email/verbs.py -diff
+
+# The OpenAPI codegen target (ota_dashboard_web/src/api/generated/) ships in
+# Phase 4C.2 alongside the frontend; its linguist-generated markers land then.
