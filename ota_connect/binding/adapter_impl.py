@@ -33,7 +33,7 @@ from ota_core.integration_source.manifest import AdapterManifest
 class AdapterImpl(Protocol):
     """Runtime contract for a Connect adapter implementation."""
 
-    manifest: AdapterManifest
+    manifest: AdapterManifest | None
 
     def invoke(self, capability: str, verb: str, /, **kwargs: Any) -> Any:
         """Dispatch a capability verb call to the underlying integration.

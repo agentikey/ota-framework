@@ -28,11 +28,12 @@ repos:
         entry: bash -c 'git diff --exit-code -- ota_connect/_types/ ota_connect/messaging/verbs.py ota_connect/email/verbs.py'
         pass_filenames: false
 
-      # Dormant until Phase 4C.2 creates ota_dashboard_web/. The bash guard
-      # makes the hook a no-op while the frontend doesn't exist; once it lands
-      # this enforces the OpenAPI -> TypeScript codegen drift check per §3.3.
+      # Enforces the OpenAPI -> TypeScript codegen drift check per §3.3.
+      # No-op until BOTH ota_dashboard_web/ exists AND pnpm is installed AND
+      # node_modules has been populated (`pnpm install`). The CI workflow
+      # always has pnpm + node_modules, so it does enforce there.
       - id: gen-api-sync
         name: OpenAPI -> TypeScript codegen sync (Phase 4C.2)
         language: system
-        entry: bash -c 'if [ -d ota_dashboard_web ]; then cd ota_dashboard_web && pnpm gen-api && git diff --exit-code -- src/api/generated; fi'
+        entry: scripts/check_gen_api_sync.sh
         pass_filenames: false

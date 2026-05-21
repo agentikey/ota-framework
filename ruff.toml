@@ -20,6 +20,11 @@ ignore = [
     "UP047",
 ]
 
+[lint.per-file-ignores]
+# FastAPI's `Depends()` / `Query()` are idiomatic in argument defaults; B008
+# is not the right rule for them.
+"ota_dashboard_api/routes/*.py" = ["B008"]
+
 [format]
 quote-style = "double"
 indent-style = "space"

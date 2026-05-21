@@ -8,24 +8,16 @@ them as problems. Each item is tagged with the phase that should pick it up.
 
 ### Phase 4A — adapters & runtime contracts
 
-- **Generated `OTAConnectError` classes still lack a real `__init__`.** Phase 3
-  works around this with [`ota_connect.binding.error_norm.make_error`](../ota_connect/binding/error_norm.py),
-  which constructs instances via `__new__` + `setattr` + manual
-  `Exception.__init__`. Routines never call this — only the error
-  normalization decorator and adapter authors do. The proper fix is to
-  update [`scripts/gen_vocab_stubs.py`](../scripts/gen_vocab_stubs.py) to
-  emit `@dataclass(kw_only=True, eq=False)` on each generated error class
-  (with a `__post_init__` that calls `Exception.__init__` for a useful
-  `str(exc)`). Pin this when the first real adapter starts raising errors.
+- **Generated `OTAConnectError` classes still lack a real `__init__`.**
+  Workaround unchanged in Phase 4 — adapters call
+  [`make_error`](../ota_connect/binding/error_norm.py) instead of the
+  bare constructor. Codegen patch deferred until v0.2.
 
-- **Adapter `invoke()` is sync at the protocol boundary.** Phase 3 declared
-  [`AdapterImpl.invoke`](../ota_connect/binding/adapter_impl.py) as a sync
-  method because the generated verbs in `ota_connect.<capability>.verbs` are
-  sync. Real Slack / Gmail adapters in Phase 4A do async I/O internally;
-  they'll need to bridge with `concurrent.futures.ThreadPoolExecutor` running
-  a private asyncio loop and `asyncio.run_coroutine_threadsafe(...).result()`
-  inside `invoke()`. Mock adapters in `tests/fixtures/adapters/` are pure
-  sync. Re-evaluate async-everywhere if the bridge becomes a perf problem.
+- ~~**Adapter `invoke()` is sync at the protocol boundary.**~~
+  **CONFIRMED in Phase 4A.** Both `slack_socket_adapter` and
+  `gmail_oauth_adapter` use sync `httpx.Client` blocking calls; the
+  pre-built protocol holds for v0.1. Real async I/O via the
+  thread-pool bridge stays deferred until measured latency demands it.
 
 - **L0b → NetworkPosture cascade still manual.** The architecture
   cross-contract invariant (revoke a credential → strip its egress patterns
@@ -46,21 +38,22 @@ them as problems. Each item is tagged with the phase that should pick it up.
 
 ### Phase 4B — routine HITL
 
-- **ActionRouter is a dumb single-handler-per-routine map.**
-  [`ota_connect.binding.actions.ActionRouter`](../ota_connect/binding/actions.py)
-  routes by `routine_id`. HITL gates in Phase 4B need richer dispatch
-  (gate-instance-scoped handlers, expiration, similarity-based auto-approval
-  hookup). Keep the API surface — `register(routine_id, handler)` and
-  `dispatch(event) -> bool` — but layer a gate router on top, not a rewrite.
+- ~~**ActionRouter is a dumb single-handler-per-routine map.**~~
+  **RESOLVED in Phase 4B.3.** [`GateManager`](../ota_core/policy/gates.py)
+  sits on top of the ActionRouter contract — it owns the gate-instance
+  state machine (pending → approved / rejected / modified_and_approved /
+  auto_approved / expired) and its three approval modes. The
+  ActionRouter is still the last-mile delivery for Slack action callbacks;
+  the gate manager is the policy layer.
 
 ### Phase 4C — dashboard
 
 - **Audit emission for dropped action callbacks is severity=warn.**
   When an action arrives for an unknown `routine_id`,
   `ActionRouter.dispatch` still emits the audit event with `delivered=False`
-  and `severity="warn"`. The dashboard audit-log viewer (Phase 4C.6) should
-  surface these prominently — a delivery drop is usually a routine that got
-  uninstalled while messages were in flight.
+  and `severity="warn"`. Phase 4C.6 dashboard audit-log viewer surfaces all
+  warn-level events; client-side filtering on `severity_at_least=warn`
+  pulls them up.
 
 ### Phase 5 — deployment
 

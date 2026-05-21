@@ -1,0 +1,32 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ota_dashboard_web/**"
+      - ".github/workflows/frontend.yml"
+  pull_request:
+    paths:
+      - "ota_dashboard_web/**"
+      - ".github/workflows/frontend.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: ota_dashboard_web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: ota_dashboard_web/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm build

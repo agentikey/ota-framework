@@ -11,6 +11,18 @@ from ota_core.policy.errors import (
     PolicyError,
     ScopeEscalationError,
 )
+from ota_core.policy.gates import (
+    GateAlreadyDecidedError,
+    GateDecision,
+    GateError,
+    GateInstance,
+    GateManager,
+    GateNotFoundError,
+    GateProposal,
+    GateRegistry,
+    GateRejected,
+    GateStore,
+)
 from ota_core.policy.l0a import DEFAULT_L0A_BASE, L0aPromptBuilder
 from ota_core.policy.l0b import (
     L0bEnforcer,
@@ -21,6 +33,16 @@ from ota_core.policy.l0b import (
 __all__ = [
     "DEFAULT_L0A_BASE",
     "BudgetExceededError",
+    "GateAlreadyDecidedError",
+    "GateDecision",
+    "GateError",
+    "GateInstance",
+    "GateManager",
+    "GateNotFoundError",
+    "GateProposal",
+    "GateRegistry",
+    "GateRejected",
+    "GateStore",
     "IntegrationNotAllowedError",
     "L0aPromptBuilder",
     "L0bEnforcer",

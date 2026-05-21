@@ -7,17 +7,27 @@ first-client delivery.
 
 ## Status
 
-Phase 3 (Capability Layer) complete: 10 work packages from
-[docs/build-plan-v0.md](docs/build-plan-v0.md) §5.4 landed (binding manifest
-schema, registry, longest-prefix resolver, install validator, dispatch glue,
-error normalization, `iter_all`, action callback dispatch, inbound email
-loop, two mock adapters). 346 tests pass; ruff clean; mypy clean on Phase 3
-code. Phase 4 (adapters + routine + dashboard) is next.
+Phase 4 (Adapters + Routine + Dashboard) complete: all 22 work packages from
+[docs/build-plan-v0.md](docs/build-plan-v0.md) §5.5 landed. Stream A: shared
+OAuth helper (`ota_core/oauth/`), per-verb conformance harness
+(`tests/vocabulary/`), full `slack_socket_adapter` (5 messaging verbs),
+full `gmail_oauth_adapter` (9 email verbs, history-list inbound polling).
+Stream B: complete `email_triage` routine — config schema, per-instance
+SQLite state, three-tier `routine.md` + helpers, HITL gate primitives
+(`ota_core/policy/gates.py`) with all three approval modes, trust-promotion
+auto-send, criteria-drift detector. Stream C: FastAPI dashboard backend
+(`ota_dashboard_api/`) with approval queue (HTTP + WebSocket), audit log
+viewer + CSV export, `/why <email_id>`, knob editor, fleet, critical
+banner; Vite + React 19 + TypeScript + Tailwind v4 frontend skeleton
+(`ota_dashboard_web/`) with shadcn-style components for every surface.
+439 tests pass; ruff clean; mypy clean on Phase 4 code. Phase 5 (Mode 2
+deployment) is next.
 
 Carry-forward items by phase:
 [phase-1-notes.md](docs/phase-1-notes.md),
 [phase-2-notes.md](docs/phase-2-notes.md),
-[phase-3-notes.md](docs/phase-3-notes.md).
+[phase-3-notes.md](docs/phase-3-notes.md),
+[phase-4-notes.md](docs/phase-4-notes.md).
 
 ## Architecture at a glance
 
@@ -26,10 +36,11 @@ Four components on one codebase. Full architecture in
 
 | Component | Role |
 | --- | --- |
-| `ota_core/` | Framework engine: conductor, routine engine, L0a/L0b policy layer, storage (SQLite WAL + markdown projection), audit, observability, identity, secrets, LLM provider seam, HTTP client. |
-| `ota_connect/` | Capability adapter library. Routines invoke `ota_connect.<capability>.<verb>(...)`; the binding layer resolves to a concrete adapter at runtime. Capability vocabulary in [`vocabulary/`](vocabulary/). |
-| `ota_routines/` | Per-client routines. v0.1 has `email_triage`. |
-| `ota_dashboard_api/` | FastAPI backend for the operator dashboard. Frontend (`ota_dashboard_web/`) lands in Phase 4C. |
+| `ota_core/` | Framework engine: conductor, routine engine, L0a/L0b policy layer, HITL gates, storage (SQLite WAL + markdown projection), audit (write + read), observability, identity, secrets, OAuth, LLM provider seam, HTTP client. |
+| `ota_connect/` | Capability adapter library. Routines invoke `ota_connect.<capability>.<verb>(...)`; the binding layer resolves to a concrete adapter at runtime. Ships `slack_socket_adapter` + `gmail_oauth_adapter` in v0.1. Capability vocabulary in [`vocabulary/`](vocabulary/). |
+| `ota_routines/` | Per-client routines. v0.1 ships `email_triage` (three-tier Reader / Drafter / Auto with trust-promotion). |
+| `ota_dashboard_api/` | FastAPI backend for the operator dashboard. |
+| `ota_dashboard_web/` | Vite + React + TypeScript + Tailwind v4 frontend for the operator dashboard. |
 
 Five canonical contracts wire these together:
 [docs/contracts.md](docs/contracts.md).
@@ -102,7 +113,8 @@ The same pattern applies to the dashboard's OpenAPI → TypeScript codegen
   decisions awaiting merge into architecture.md.
 - [docs/phase-1-notes.md](docs/phase-1-notes.md),
   [docs/phase-2-notes.md](docs/phase-2-notes.md),
-  [docs/phase-3-notes.md](docs/phase-3-notes.md): per-phase carry-forward
+  [docs/phase-3-notes.md](docs/phase-3-notes.md),
+  [docs/phase-4-notes.md](docs/phase-4-notes.md): per-phase carry-forward
   items.
 - [vocabulary/](vocabulary/): capability vocabulary specs (`_types.md`,
   `messaging.md`, `email.md`, `_roster.md`).

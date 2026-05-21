@@ -1,0 +1,15 @@
+schema_version: 0.1.0
+adapter_id: slack_socket_adapter
+integration_id: slack.com
+version: 0.1.0
+framework_compat: ">=0.1.0"
+capabilities:
+  - capability: messaging
+    version: 0.1.0
+auth_styles:
+  - oauth2
+entrypoint: ota_connect.adapters.slack_socket.adapter:SlackSocketAdapter
+description: Slack messaging adapter using OAuth + Web API + Socket Mode events.
+tags:
+  - production
+  - slack

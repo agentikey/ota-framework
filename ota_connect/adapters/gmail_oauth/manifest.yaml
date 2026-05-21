@@ -1,0 +1,15 @@
+schema_version: 0.1.0
+adapter_id: gmail_oauth_adapter
+integration_id: gmail.com
+version: 0.1.0
+framework_compat: ">=0.1.0"
+capabilities:
+  - capability: email
+    version: 0.1.0
+auth_styles:
+  - oauth2
+entrypoint: ota_connect.adapters.gmail_oauth.adapter:GmailOAuthAdapter
+description: Gmail email adapter using OAuth + REST API + polling-based inbound.
+tags:
+  - production
+  - gmail
