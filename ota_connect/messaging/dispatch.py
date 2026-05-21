@@ -1,13 +1,17 @@
 from __future__ import annotations
 
-from typing import Any, NoReturn
+from typing import Any
+
+from ota_connect.binding.dispatch import dispatch_capability
 
 
-def dispatch(verb_name: str, **kwargs: Any) -> NoReturn:
-    """Placeholder. Phase 3.5 (capability dispatch layer) wires this to:
-    binding resolution -> adapter invocation -> error normalization -> audit emit.
+def dispatch(verb_name: str, **kwargs: Any) -> Any:
+    """Forwards `ota_connect.messaging.<verb>(...)` to the capability layer.
+
+    The generated `verbs.py` calls `dispatch("send_message", **locals())`;
+    `locals()` already contains the verb's keyword arguments. We strip the
+    routine-only first positional values that landed in locals() — there are
+    none in the current vocabulary; every messaging verb passes only its
+    declared kwargs.
     """
-    raise NotImplementedError(
-        f"ota_connect.messaging.dispatch({verb_name!r}, ...) "
-        "not wired yet; see build-plan-v0.md §5.4 work package 3.5"
-    )
+    return dispatch_capability("messaging", verb_name, **kwargs)

@@ -7,12 +7,17 @@ first-client delivery.
 
 ## Status
 
-Phase 1 (Foundation) complete: 11 work packages from
-[docs/build-plan-v0.md](docs/build-plan-v0.md) §5.2 landed. 80 tests pass;
-ruff + mypy clean. Phase 2 (framework runtime + seams) is next.
+Phase 3 (Capability Layer) complete: 10 work packages from
+[docs/build-plan-v0.md](docs/build-plan-v0.md) §5.4 landed (binding manifest
+schema, registry, longest-prefix resolver, install validator, dispatch glue,
+error normalization, `iter_all`, action callback dispatch, inbound email
+loop, two mock adapters). 346 tests pass; ruff clean; mypy clean on Phase 3
+code. Phase 4 (adapters + routine + dashboard) is next.
 
-Carry-forward items for later phases:
-[docs/phase-1-notes.md](docs/phase-1-notes.md).
+Carry-forward items by phase:
+[phase-1-notes.md](docs/phase-1-notes.md),
+[phase-2-notes.md](docs/phase-2-notes.md),
+[phase-3-notes.md](docs/phase-3-notes.md).
 
 ## Architecture at a glance
 
@@ -61,6 +66,8 @@ Phase 4 (dev server), Phase 5 (Dockerfile), and Phase 4C.2 (OpenAPI codegen).
 ota_core/             # Framework engine (sync API; async paths wrap in asyncio.to_thread)
 ota_connect/          # Capability adapter library
   _types/             # Generated from vocabulary/_types.md
+  _schemas/           # JSON Schemas exported for adapter authors (Phase 3.1)
+  binding/            # Capability dispatch + binding layer (Phase 3)
   messaging/verbs.py  # Generated from vocabulary/messaging.md
   email/verbs.py      # Generated from vocabulary/email.md
 ota_routines/         # Bundled routines (email_triage)
@@ -69,6 +76,7 @@ vocabulary/           # Capability vocabulary specs (source of truth)
 scripts/              # Codegen tools
 docs/                 # Architecture, contracts, build plan, phase notes
 tests/                # Mirrors the source tree
+tests/fixtures/       # Mock adapters used in dispatch / install tests
 ```
 
 ## Codegen discipline
@@ -92,7 +100,9 @@ The same pattern applies to the dashboard's OpenAPI → TypeScript codegen
   build plan: scope, sequencing, tech stack, operational model.
 - [docs/pending-architecture-updates.md](docs/pending-architecture-updates.md):
   decisions awaiting merge into architecture.md.
-- [docs/phase-1-notes.md](docs/phase-1-notes.md): Phase 1 carry-forward
+- [docs/phase-1-notes.md](docs/phase-1-notes.md),
+  [docs/phase-2-notes.md](docs/phase-2-notes.md),
+  [docs/phase-3-notes.md](docs/phase-3-notes.md): per-phase carry-forward
   items.
 - [vocabulary/](vocabulary/): capability vocabulary specs (`_types.md`,
   `messaging.md`, `email.md`, `_roster.md`).

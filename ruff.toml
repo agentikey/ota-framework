@@ -15,6 +15,9 @@ ignore = [
     # vocabulary specs use Generic[T] (legacy) for type-parameterized classes;
     # auto-rewrite to PEP 695 is unsafe (orphans the TypeVar declaration).
     "UP046",
+    # Generic function form `def f[T](...)` (PEP 695). Codebase uses the
+    # `TypeVar`-based form for consistency with the generic classes above.
+    "UP047",
 ]
 
 [format]

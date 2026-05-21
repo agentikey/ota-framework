@@ -36,7 +36,7 @@ def send_email(
     attachments: list[Attachment] | None = None,
     importance: Importance = "normal",
 ) -> EmailRef:
-    return dispatch("send_email", **locals())
+    return dispatch("send_email", **locals())  # type: ignore[no-any-return]
 
 
 @verb(
@@ -54,7 +54,7 @@ def create_draft(
     reply_to: EmailRef | None = None,
     attachments: list[Attachment] | None = None,
 ) -> DraftRef:
-    return dispatch("create_draft", **locals())
+    return dispatch("create_draft", **locals())  # type: ignore[no-any-return]
 
 
 @verb(
@@ -65,7 +65,7 @@ def create_draft(
 def send_draft(
     draft_ref: DraftRef,
 ) -> EmailRef:
-    return dispatch("send_draft", **locals())
+    return dispatch("send_draft", **locals())  # type: ignore[no-any-return]
 
 
 @verb(
@@ -93,7 +93,7 @@ def list_mailbox(
     limit: int = 25,
     cursor: Cursor | None = None,
 ) -> Page[EmailRef]:
-    return dispatch("list_mailbox", **locals())
+    return dispatch("list_mailbox", **locals())  # type: ignore[no-any-return]
 
 
 @verb(
@@ -107,7 +107,7 @@ def read_email_thread(
     limit: int = 50,
     cursor: Cursor | None = None,
 ) -> Page[EmailRef]:
-    return dispatch("read_email_thread", **locals())
+    return dispatch("read_email_thread", **locals())  # type: ignore[no-any-return]
 
 
 @verb(

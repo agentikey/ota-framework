@@ -33,7 +33,7 @@ def send_message(
     attachments: list[Attachment] | None = None,
     importance: Importance = "normal",
 ) -> MessageRef:
-    return dispatch("send_message", **locals())
+    return dispatch("send_message", **locals())  # type: ignore[no-any-return]
 
 
 @verb(
@@ -45,7 +45,7 @@ def edit_message(
     message_ref: MessageRef,
     new_content: str | list[Block],
 ) -> MessageRef:
-    return dispatch("edit_message", **locals())
+    return dispatch("edit_message", **locals())  # type: ignore[no-any-return]
 
 
 @verb(
@@ -70,7 +70,7 @@ def read_thread(
     limit: int = 100,
     cursor: Cursor | None = None,
 ) -> Page[MessageRef]:
-    return dispatch("read_thread", **locals())
+    return dispatch("read_thread", **locals())  # type: ignore[no-any-return]
 
 
 @verb(
@@ -85,4 +85,4 @@ def list_recent_messages(
     limit: int = 50,
     cursor: Cursor | None = None,
 ) -> Page[MessageRef]:
-    return dispatch("list_recent_messages", **locals())
+    return dispatch("list_recent_messages", **locals())  # type: ignore[no-any-return]

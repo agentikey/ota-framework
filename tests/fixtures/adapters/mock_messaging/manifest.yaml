@@ -1,0 +1,15 @@
+schema_version: 0.1.0
+adapter_id: mock_messaging
+integration_id: mock.messaging
+version: 0.1.0
+framework_compat: ">=0.1.0"
+capabilities:
+  - capability: messaging
+    version: 0.1.0
+auth_styles:
+  - api_key
+entrypoint: tests.fixtures.adapters.mock_messaging.adapter:MockMessagingAdapter
+description: In-memory messaging adapter used by Phase 3 dispatch tests.
+tags:
+  - mock
+  - dev

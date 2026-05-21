@@ -321,7 +321,7 @@ def _signature_to_body(signature: str, *, verb_name: str) -> str:
     call = f'dispatch("{verb_name}", **locals())'
     if returns_none:
         return s + f"\n    {call}"
-    return s + f"\n    return {call}"
+    return s + f"\n    return {call}  # type: ignore[no-any-return]"
 
 
 _IDENT_PATTERN = re.compile(r"\b([A-Za-z_]\w*)\b")

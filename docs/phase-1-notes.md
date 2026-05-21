@@ -20,16 +20,13 @@ with the phase that should pick it up.
 
 ### Phase 3 — capability dispatch
 
-- **`dispatch()` placeholders.** [ota_connect/messaging/dispatch.py](../ota_connect/messaging/dispatch.py) and [ota_connect/email/dispatch.py](../ota_connect/email/dispatch.py) raise `NotImplementedError` with a Phase 3.5 reference. Generated `verbs.py` modules call them. Phase 3.5 wires binding resolution → adapter invocation → error normalization → audit emission.
+- ~~**`dispatch()` placeholders.**~~ **RESOLVED in Phase 3.5.** [ota_connect/messaging/dispatch.py](../ota_connect/messaging/dispatch.py) and [ota_connect/email/dispatch.py](../ota_connect/email/dispatch.py) now forward to `ota_connect.binding.dispatch.dispatch_capability(...)`, which resolves the binding, applies L0b enforcement, and invokes the adapter inside the error-normalization context.
 
-- **Cross-contract validation not yet runtime-enforced.** §16 cross-contract invariants 9 and 10 (Contract C ↔ D reconciliation at routine-load) need a higher-level `validators.py` that holds references to both a `RoutineBundleManifest` and the active `IntegrationRegistryManifest`. The per-contract Pydantic models in [ota_core/contracts/](../ota_core/contracts/) only validate within a single contract. Phase 2 (routine loader) or Phase 3 (capability layer) owns this glue.
+- ~~**Cross-contract validation not yet runtime-enforced.**~~ **RESOLVED in Phase 3.4.** [ota_connect/binding/validator.py](../ota_connect/binding/validator.py) holds references to a `RoutineBundleManifest` *and* the active `IntegrationRegistryManifest`, and runs the §16 invariant-9 checks (integration exists, binding_level supported, scopes in vocabulary). Invariant 10 (Identity vs Secrets separation) is structural — enforced by the seam boundaries, not a runtime check.
 
 ### Phase 4 — adapters
 
-- **Generated error classes lack `__init__`.** [ota_connect/_types/errors.py](../ota_connect/_types/errors.py) is generated faithfully from `vocabulary/_types.md`, which declares class-body annotations only. So `OTAConnectError("msg")` works (Exception's `__init__` takes the message), but `RateLimited(retry_after=timedelta(seconds=30))` fails with `unexpected keyword argument`. Two fix options:
-  - Update the vocab spec to include `__init__` signatures, then regenerate.
-  - Have the codegen synthesize an `__init__` from the annotated fields.
-  - Decide when adapters start raising these in Phase 4A.
+- **Generated error classes lack `__init__`.** [ota_connect/_types/errors.py](../ota_connect/_types/errors.py) is generated faithfully from `vocabulary/_types.md`, which declares class-body annotations only. So `OTAConnectError("msg")` works (Exception's `__init__` takes the message), but `RateLimited(retry_after=timedelta(seconds=30))` fails with `unexpected keyword argument`. **Phase 3 workaround:** [`ota_connect.binding.error_norm.make_error`](../ota_connect/binding/error_norm.py) instantiates via `__new__` + `setattr`, bypassing the missing `__init__`. Long-term fix (Phase 4A): emit `@dataclass(kw_only=True, eq=False)` on each generated error class — see [docs/phase-3-notes.md](phase-3-notes.md).
 
 - **`AsyncAnthropic.close()` assumed async, not verified.** [ota_core/llm/anthropic_provider.py](../ota_core/llm/anthropic_provider.py) calls `await self._client.close()` in `aclose()`. Test uses a fake. If the SDK version exposes `close()` as sync, the call raises `TypeError` at first real shutdown. Verify when the first adapter (Phase 4A) makes a real LLM call.
 

@@ -1,0 +1,15 @@
+schema_version: 0.1.0
+adapter_id: mock_email
+integration_id: mock.email
+version: 0.1.0
+framework_compat: ">=0.1.0"
+capabilities:
+  - capability: email
+    version: 0.1.0
+auth_styles:
+  - api_key
+entrypoint: tests.fixtures.adapters.mock_email.adapter:MockEmailAdapter
+description: In-memory email adapter used by Phase 3 dispatch tests.
+tags:
+  - mock
+  - dev

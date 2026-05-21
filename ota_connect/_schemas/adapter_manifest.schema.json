@@ -1,0 +1,113 @@
+{
+  "$defs": {
+    "AdapterCapabilityClaim": {
+      "additionalProperties": false,
+      "properties": {
+        "capability": {
+          "minLength": 1,
+          "title": "Capability",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "capability",
+        "version"
+      ],
+      "title": "AdapterCapabilityClaim",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "adapter_id": {
+      "minLength": 1,
+      "title": "Adapter Id",
+      "type": "string"
+    },
+    "auth_styles": {
+      "items": {
+        "enum": [
+          "oauth2",
+          "api_key",
+          "webhook_secret",
+          "mtls",
+          "custom"
+        ],
+        "type": "string"
+      },
+      "title": "Auth Styles",
+      "type": "array"
+    },
+    "capabilities": {
+      "items": {
+        "$ref": "#/$defs/AdapterCapabilityClaim"
+      },
+      "minItems": 1,
+      "title": "Capabilities",
+      "type": "array"
+    },
+    "description": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Description"
+    },
+    "entrypoint": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Entrypoint"
+    },
+    "framework_compat": {
+      "minLength": 1,
+      "title": "Framework Compat",
+      "type": "string"
+    },
+    "integration_id": {
+      "minLength": 1,
+      "title": "Integration Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "tags": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Tags",
+      "type": "array"
+    },
+    "version": {
+      "title": "Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "adapter_id",
+    "integration_id",
+    "version",
+    "framework_compat",
+    "capabilities"
+  ],
+  "title": "AdapterManifest",
+  "type": "object"
+}

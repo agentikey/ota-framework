@@ -1,0 +1,15 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "capabilities": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Map of capability or capability.verb prefix to adapter_id. Longest-prefix-match wins at resolve time.",
+      "title": "Capabilities",
+      "type": "object"
+    }
+  },
+  "title": "Bindings",
+  "type": "object"
+}
